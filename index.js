@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const userRoutes = require('./routes/users.js')
 const postRoutes = require('./routes/posts.js')
 const commentRoutes = require('./routes/comments.js')
@@ -14,6 +15,7 @@ const app = express();
 // =========  middlware  ===========
 app.use(cors());
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // =================================
 app.use('/api/auths', authRoutes);
