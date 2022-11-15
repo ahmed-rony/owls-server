@@ -8,24 +8,27 @@ const register = (req, res) =>{
 
     db.query(q, [req.body.username], (err, data)=>{
         if(err){res.status(500).send(err)};
-        if(data.length){res.status(409).send('user alrady exists!')};
-        
-        // CREATE A NEW USER
-          // HASH THE PASSWORD  == npm i bcryptjs;
-          const salt = bcrypt.genSaltSync(10);
-          const hashedPassword = bcrypt.hashSync(req.body.password, salt);
+        if(data.length){res.status(409).send('user alrady exists!')}
+        else{
+            // CREATE A NEW USER
+              // HASH THE PASSWORD  == npm i bcryptjs;
+              const salt = bcrypt.genSaltSync(10);
+              const hashedPassword = bcrypt.hashSync(req.body.password, salt);
+    
+              const q = 'INSERT INTO users (`username`, `email`, `password`, `name`) VALUE (?)';
+              const values = [
+                req.body.username,
+                req.body.email,
+                hashedPassword,
+                req.body.name
+              ];
+              db.query(q, [values], (err, data)=>{
+                  if(err){res.status(500).send(err)};
+                  res.status(200).send('User has been created!');
+              })
 
-          const q = 'INSERT INTO users (`username`, `email`, `password`, `name`) VALUE (?)';
-          const values = [
-            req.body.username,
-            req.body.email,
-            hashedPassword,
-            req.body.name
-          ];
-          db.query(q, [values], (err, data)=>{
-              if(err){res.status(500).send(err)};
-              res.status(200).send('User has been created!');
-          })
+        }
+        
     })
 }
 
