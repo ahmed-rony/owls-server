@@ -1,50 +1,50 @@
 const db = require("../routes/connect.js");
 const jwt = require('jsonwebtoken');
 
-const getLikes = (req, res) =>{
-    const q = `SELECT userId FROM likes WHERE postId = ?`;
+const getRelationships = (req, res) =>{
+    const q = `SELECT followerUserId FROM relationships WHERE followedUserId = ?`;
 
-    db.query(q, [req.query.postId], (err, data) =>{
+    db.query(q, [req.query.followedUserId], (err, data) =>{
         if(err){res.status(500).send(err)};
-        res.send(data.map(like=> like.userId));
+        res.send(data.map(relationship=> relationship.followerUserId));  // VID: 2.01.40hr
     })
 }
 
-const addLikes = (req, res) => {
+const addRelationships = (req, res) => {
     const token = req.cookies.accessToken;
     if(!token){res.status(401).send("Not logged in!")}
     
     jwt.verify(token, 'secretkey', (err, userInfo)=>{
         if(err){res.status(403).send("Token is not valid!")}  // we have a token but it's not valid;
         
-        const q = "INSERT INTO likes (`userId`, `postId`) VALUES (?)";
+        const q = "INSERT INTO relationships (`followerUserId`, `followedUserId`) VALUES (?)";  // we are the follower;
 
         const values = [
             userInfo.id,
-            req.body.postId
+            req.body.userId
         ]
     
         db.query(q, [values], (err, data) =>{  // userInfo is auth.js's jwt token id;
             if(err){res.status(500).send(err)};
-            res.status(200).send('Post has been liked!');
+            res.status(200).send('Following!');
         })
     })
 }
 
-const deleteLikes = (req, res) => {
+const deleteRelationships = (req, res) => {
     const token = req.cookies.accessToken;
     if(!token){res.status(401).send("Not logged in!")}
     
     jwt.verify(token, 'secretkey', (err, userInfo)=>{
         if(err){res.status(403).send("Token is not valid!")}  // we have a token but it's not valid;
         
-        const q = "DELETE FROM likes WHERE `userId` = ? AND `postId` = ?";
+        const q = "DELETE FROM relationships WHERE `followerUserId` = ? AND `followedUserId` = ?";
     
-        db.query(q, [userInfo.id, req.query.postId], (err, data) =>{  // userInfo is auth.js's jwt token id;
+        db.query(q, [userInfo.id, req.query.userId], (err, data) =>{  // userInfo is auth.js's jwt token id;
             if(err){res.status(500).send(err)};
-            res.status(200).send('Like has been removed!');
+            res.status(200).send('Unfollow!');
         })
     })
 }
 
-module.exports = {getLikes, addLikes, deleteLikes};
+module.exports = { getRelationships, addRelationships, deleteRelationships};
