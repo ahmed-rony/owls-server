@@ -11,10 +11,9 @@ const getPosts = (req, res) =>{
 
     jwt.verify(token, 'secretkey', (err, userInfo)=>{
         if(err){res.status(403).send("Token is not valid!")}  // we have a token but it's not valid;
-        
+
         // VID: 1hr, 1hr:7
-        const q = userId !== 'undefined' 
-        ? `SELECT p.*, u.id AS userId, name, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId) WHERE p.userId = ? ORDER BY p.createDate DESC` : `SELECT p.*, u.id AS userId, name, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId) LEFT JOIN relationships AS r ON (p.userId = r.followedUserId) WHERE r.followerUserId = ? OR p.userId = ? ORDER BY p.createDate DESC`;
+        const q = userId !== 'undefined' ? `SELECT p.*, u.id AS userId, name, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId) WHERE p.userId = ? ORDER BY p.createDate DESC` : `SELECT p.*, u.id AS userId, name, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId) LEFT JOIN relationships AS r ON (p.userId = r.followedUserId) WHERE r.followerUserId = ? OR p.userId = ? ORDER BY p.createDate DESC`;
     
         const values = userId !== 'undefined' ? [userId] : [userInfo.id, userInfo.id];
         db.query(q, values, (err, data) =>{  // userInfo is auth.js's jwt token id;
@@ -22,7 +21,7 @@ const getPosts = (req, res) =>{
             res.send(data);
         })
     })
-    
+
 };
 
 const addPost = (req, res) =>{
