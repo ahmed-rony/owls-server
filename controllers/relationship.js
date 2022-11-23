@@ -2,7 +2,7 @@ const db = require("../routes/connect.js");
 const jwt = require('jsonwebtoken');
 
 const getRelationships = (req, res) =>{
-    const q = `SELECT followerUserId FROM relationships WHERE followedUserId = ?`;
+    const q = `SELECT followerUserId FROM relationships WHERE followedUserId = ?`;  // jei page e jacchi tate check korchi currentUser/ami achi kina;
 
     db.query(q, [req.query.followedUserId], (err, data) =>{
         if(err){res.status(500).send(err)};
